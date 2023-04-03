@@ -1,10 +1,10 @@
-package Sclient;
+package model;
 
 
 import java.util.Date;
 
-public class Complaint {
-    private int complaintID;
+public class Query {
+    private int queryID;
     private String studentID;
     private String details;
     private String category;
@@ -12,19 +12,19 @@ public class Complaint {
     private int responderID;
     private String response;
 
-
-    public Complaint(int complaintID, String studentID, String details) {
-        this.complaintID = complaintID;
+    public Query(int queryID, String studentID, String details) {
+        this.queryID = queryID;
         this.studentID = studentID;
         this.details = details;
+
     }
 
-    public Complaint(String category) {
+    public Query(String category) {
         this.category= category;
     }
 
-    public Complaint(int complaintID,String studentID, String details,Date responseDate, int responderID,String response ){
-        this.complaintID= complaintID;
+    public Query(int queryID,String studentID, String details,Date responseDate, int responderID,String response ){
+        this.queryID= queryID;
         this.studentID = studentID;
         this.details = details;
         this.responseDate= responseDate;
@@ -32,9 +32,8 @@ public class Complaint {
         this.response = response;
     }
 
-
-    public int getComplaintID() {
-        return complaintID;
+    public int getQueryID() {
+        return queryID;
     }
 
     public String getStudentID() {
@@ -57,5 +56,8 @@ public class Complaint {
 
     public String getResponse(){return response;}
 }
+
+
+
 
 

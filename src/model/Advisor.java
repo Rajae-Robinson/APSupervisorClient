@@ -1,4 +1,4 @@
-package Sclient;
+package model;
 
 
 

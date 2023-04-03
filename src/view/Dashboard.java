@@ -1,5 +1,11 @@
-package Sclient;
+package view;
 
+
+import controller.Client;
+import model.Advisor;
+import model.Complaint;
+import Sclient.DatabaseConnection;
+import model.Query;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -7,9 +13,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.net.Socket;
 import java.util.List;
 
 
@@ -19,10 +22,9 @@ public class Dashboard extends JFrame {
     private final JButton[] menuButtons;
     private final JPanel[] panels;
     private final String supervisorID;
+    private Client client;
 
-    private Socket socket;
-    private DataInputStream in;
-    private DataOutputStream out;
+
 
 
     private final Border defaultBorder = BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(46, 49, 49));
@@ -30,6 +32,7 @@ public class Dashboard extends JFrame {
 
     public Dashboard(String supervisorID) {
         this.supervisorID = supervisorID;
+        this.client = new Client("localhost", 8888);
         setTitle("Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
@@ -67,10 +70,10 @@ public class Dashboard extends JFrame {
         menuButtons[0].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int outstandingQueries = DatabaseConnection.fetchOutstandingQueries();
-                int resolvedQueries = DatabaseConnection.fetchResolvedQueries();
-                int outstandingComplaints = DatabaseConnection.fetchOutstandingComplaints();
-                int resolvedComplaints = DatabaseConnection.fetchResolvedComplaints();
+                int outstandingQueries = client.fetchOutstandingQueries();
+                int resolvedQueries = client.fetchResolvedQueries();
+                int outstandingComplaints = client.fetchOutstandingComplaints();
+                int resolvedComplaints = client.fetchResolvedComplaints();
 
                 updateServicesPanel(panels[0], outstandingQueries, resolvedQueries, outstandingComplaints, resolvedComplaints);
                 ((CardLayout) centerPanel.getLayout()).show(centerPanel, menuButtons[0].getText());
@@ -81,8 +84,8 @@ public class Dashboard extends JFrame {
         menuButtons[1].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                List<Query> outstandingQueriesList = DatabaseConnection.fetchOutstandingQueriesList();
-                List<Complaint> outstandingComplaintsList = DatabaseConnection.fetchOutstandingComplaintsList();
+                List<Query> outstandingQueriesList = client.fetchOutstandingQueriesList();
+                List<Complaint> outstandingComplaintsList = client.fetchOutstandingComplaintsList();
 
                 updateAssignmentsPanel(panels[1], outstandingQueriesList, outstandingComplaintsList);
                 ((CardLayout) centerPanel.getLayout()).show(centerPanel, menuButtons[1].getText());
@@ -92,8 +95,8 @@ public class Dashboard extends JFrame {
         menuButtons[2].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                List<Query> QueriescategoryList = DatabaseConnection.fetchQueriescategoryList();
-                List<Complaint> ComplaintscategoryList = DatabaseConnection.fetchComplaintscategoryList();
+                List<Query> QueriescategoryList = client.fetchQueriesCategoryList();
+                List<Complaint> ComplaintscategoryList = client.fetchComplaintsCategoryList();
 
                 updateAssignmentsPanel_new(panels[2], QueriescategoryList, ComplaintscategoryList);
                 ((CardLayout) centerPanel.getLayout()).show(centerPanel, menuButtons[2].getText());
@@ -219,10 +222,10 @@ public class Dashboard extends JFrame {
             int selectedRow = outstandingQueriesTable.getSelectedRow();
             if (selectedRow >= 0) {
                 int queryID = (int) outstandingQueriesTableModel.getValueAt(selectedRow, 0);
-                List<Advisor> advisors = DatabaseConnection.fetchAdvisors();
+                List<Advisor> advisors = client.fetchAdvisors();
                 String advisorID = showAdvisorSelectionDialog(advisors);
                 if (advisorID != null) {
-                    DatabaseConnection.assignAdvisorToQuery(advisorID, queryID);
+                    client.assignAdvisorToQuery(advisorID, queryID);
                 }
             }
         });
@@ -233,10 +236,10 @@ public class Dashboard extends JFrame {
             int selectedRow = outstandingComplaintsTable.getSelectedRow();
             if (selectedRow >= 0) {
                 int complaintID = (int) outstandingComplaintsTableModel.getValueAt(selectedRow, 0);
-                List<Advisor> advisors = DatabaseConnection.fetchAdvisors();
+                List<Advisor> advisors = client.fetchAdvisors();
                 String advisorID = showAdvisorSelectionDialog(advisors);
                 if (advisorID != null) {
-                    DatabaseConnection.assignAdvisorToComplaint(advisorID, complaintID);
+                    client.assignAdvisorToComplaint(advisorID, complaintID);
                 }
             }
         });
@@ -345,29 +348,6 @@ public class Dashboard extends JFrame {
     }
 
 
-    private void updateSettingsPanel(JPanel panel) {
-        panel.removeAll();
-
-        JLabel titleLabel = new JLabel("Settings");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setHorizontalAlignment(JLabel.CENTER);
-
-        JButton liveChatButton = new JButton("Start Live Video Chat");
-        liveChatButton.addActionListener(e -> {
-            // List<Student> students = DatabaseConnection.fetchStudents();
-            //  showStudentSelectionDialog(students);
-        });
-
-
-        panel.setLayout(new GridLayout(3, 1));
-        panel.add(titleLabel);
-        panel.add(liveChatButton);
-
-
-        panel.revalidate();
-        panel.repaint();
-    }
-
     private void updateAssignmentsPanel_new(JPanel panel, List<Query> QueriescategoryList, List<Complaint> ComplaintscategoryList) {
         panel.removeAll();
 
@@ -398,7 +378,7 @@ public class Dashboard extends JFrame {
 
                 //List<Query> queries = DatabaseConnection.fetchAllQueries(categories);
                 if (selectedCategory != null) {
-                    List<Query> queries = DatabaseConnection.fetchAllQueries(selectedCategory);
+                    List<Query> queries = client.fetchAllQueries(selectedCategory);
                     showQueryDialog(queries);
                     //showQueryDialog(queries);
                 }
@@ -413,10 +393,10 @@ public class Dashboard extends JFrame {
             int selectedRow = outstandingComplaintsTable.getSelectedRow();
             if (selectedRow >= 0) {
                 int complaintID = (int) outstandingComplaintsTableModel.getValueAt(selectedRow, 0);
-                List<Advisor> advisors = DatabaseConnection.fetchAdvisors();
+                List<Advisor> advisors = client.fetchAdvisors();
                 String advisorID = showAdvisorSelectionDialog(advisors);
                 if (advisorID != null) {
-                    DatabaseConnection.assignAdvisorToComplaint(advisorID, complaintID);
+                    client.assignAdvisorToComplaint(advisorID, complaintID);
                 }
             }
         });

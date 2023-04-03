@@ -1,6 +1,7 @@
-package Sclient;
+package model;
 
 import java.util.Date;
+import java.util.List;
 
 public class Query_category {
     private int queryID;
@@ -30,6 +31,9 @@ public class Query_category {
     public String getDetails() {
         return details;
     }
+
+
+
 }
 
 

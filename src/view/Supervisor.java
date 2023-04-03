@@ -1,6 +1,8 @@
-package Sclient;
+package view;
 
 
+
+import Sclient.DatabaseConnection;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -116,7 +118,7 @@ public class Supervisor {
                     JOptionPane.showMessageDialog(frame, "Login Successful!");
                     //Dashboard dashboard = new Dashboard();
                     String supervisorID = userID;
-                    Sclient.Dashboard dashboard = new Sclient.Dashboard(supervisorID);
+                    Dashboard dashboard = new Dashboard(supervisorID);
                 } else {
                     JOptionPane.showMessageDialog(frame, "Invalid Username or Password");
                 }
