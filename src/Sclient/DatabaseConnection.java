@@ -19,7 +19,7 @@ public class DatabaseConnection {
 
     private static final String CONNECTION_URL = "jdbc:mysql://localhost:3306/student_services?useSSL=false";
     private static final String DB_USERNAME = "root";
-    private static final String DB_PASSWORD = "0danewalter$";
+    private static final String DB_PASSWORD = "";
 
     public static Connection getConnection() {
         try {
@@ -92,74 +92,74 @@ public class DatabaseConnection {
         return -1;
     }
 
-    public static List<Query> fetchOutstandingQueriesList() {
-        List<Query> queries = new ArrayList<>();
-        String query = "SELECT queryID, studentID, details FROM Queries WHERE response IS NULL";
-
-        try (Connection connection = getConnection()) {
-            if (connection != null) {
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
-                ResultSet resultSet = preparedStatement.executeQuery();
-
-                while (resultSet.next()) {
-                    Query q = new Query(resultSet.getInt("queryID"), resultSet.getString("studentID"), resultSet.getString("details"));
-                    queries.add(q);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return queries;
-    }
-
-
-    public static List<Complaint> fetchOutstandingComplaintsList() {
-        List<Complaint> complaints = new ArrayList<>();
-        String query = "SELECT complaintID, studentID, details FROM Complaint WHERE response IS NULL";
-
-        try (Connection connection = getConnection()) {
-            if (connection != null) {
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
-                ResultSet resultSet = preparedStatement.executeQuery();
-
-                while (resultSet.next()) {
-                    Complaint c = new Complaint(resultSet.getInt("complaintID"), resultSet.getString("studentID"), resultSet.getString("details"));
-                    complaints.add(c);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return complaints;
-    }
+//    public static List<Query> fetchOutstandingQueriesList() {
+//        List<Query> queries = new ArrayList<>();
+//        String query = "SELECT queryID, studentID, details FROM Queries WHERE response IS NULL";
+//
+//        try (Connection connection = getConnection()) {
+//            if (connection != null) {
+//                PreparedStatement preparedStatement = connection.prepareStatement(query);
+//                ResultSet resultSet = preparedStatement.executeQuery();
+//
+//                while (resultSet.next()) {
+//                    Query q = new Query(resultSet.getInt("queryID"), resultSet.getString("studentID"), resultSet.getString("details"));
+//                    queries.add(q);
+//                }
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return queries;
+//    }
 
 
-    public static List<Advisor> fetchAdvisors() {
-        List<Advisor> advisors = new ArrayList<>();
-        String query = "SELECT advisorID, firstName, lastName FROM Advisor";
+//    public static List<Complaint> fetchOutstandingComplaintsList() {
+//        List<Complaint> complaints = new ArrayList<>();
+//        String query = "SELECT complaintID, studentID, details FROM Complaint WHERE response IS NULL";
+//
+//        try (Connection connection = getConnection()) {
+//            if (connection != null) {
+//                PreparedStatement preparedStatement = connection.prepareStatement(query);
+//                ResultSet resultSet = preparedStatement.executeQuery();
+//
+//                while (resultSet.next()) {
+//                    Complaint c = new Complaint(resultSet.getInt("complaintID"), resultSet.getString("studentID"), resultSet.getString("details"));
+//                    complaints.add(c);
+//                }
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return complaints;
+//    }
 
-        try (Connection connection = getConnection()) {
-            if (connection != null) {
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
-                ResultSet resultSet = preparedStatement.executeQuery();
 
-                while (resultSet.next()) {
-                    String advisorID = resultSet.getString("advisorID");
-                    String firstName = resultSet.getString("firstName");
-                    String lastName = resultSet.getString("lastName");
-
-                    Advisor advisor = new Advisor(advisorID, firstName, lastName);
-                    advisors.add(advisor);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return advisors;
-    }
+//    public static List<Advisor> fetchAdvisors() {
+//        List<Advisor> advisors = new ArrayList<>();
+//        String query = "SELECT advisorID, firstName, lastName FROM Advisor";
+//
+//        try (Connection connection = getConnection()) {
+//            if (connection != null) {
+//                PreparedStatement preparedStatement = connection.prepareStatement(query);
+//                ResultSet resultSet = preparedStatement.executeQuery();
+//
+//                while (resultSet.next()) {
+//                    String advisorID = resultSet.getString("advisorID");
+//                    String firstName = resultSet.getString("firstName");
+//                    String lastName = resultSet.getString("lastName");
+//
+//                    Advisor advisor = new Advisor(advisorID, firstName, lastName);
+//                    advisors.add(advisor);
+//                }
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return advisors;
+//    }
 
     public static void assignAdvisorToQuery(String advisorID, int queryID) {
         String query = "UPDATE Queries SET responderID = ? WHERE queryID = ?";
@@ -233,38 +233,34 @@ public class DatabaseConnection {
         return complaints;
     }
 
-    public static List<Query> fetchAllQueries(String category) {
-        List<Query> queries = new ArrayList<>();
-        String query = "SELECT queryID, studentID,details, responseDate, responderID, response FROM Queries WHERE category =? ";
-
-        try (Connection connection = getConnection()) {
-            if (connection != null) {
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setString(1, category);
-                ResultSet resultSet = preparedStatement.executeQuery();
-
-                while (resultSet.next()) {
-                    int queryID = resultSet.getInt("queryID");
-                    String studentID = resultSet.getString("studentID");
-                    String details = resultSet.getString("details");
-                    Date responseDate = resultSet.getDate("responseDate");
-                    int responderID = resultSet.getInt("responderID");
-                    String response = resultSet.getString("response");
-
-
-                    Query q = new Query(queryID,studentID,details,responseDate,responderID,response);
-                    queries.add(q);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return queries;
-    }
-
-
-
-
+//    public static List<Query> fetchAllQueries(String category) {
+//        List<Query> queries = new ArrayList<>();
+//        String query = "SELECT queryID, studentID,details, responseDate, responderID, response FROM Queries WHERE category =? ";
+//
+//        try (Connection connection = getConnection()) {
+//            if (connection != null) {
+//                PreparedStatement preparedStatement = connection.prepareStatement(query);
+//                preparedStatement.setString(1, category);
+//                ResultSet resultSet = preparedStatement.executeQuery();
+//
+//                while (resultSet.next()) {
+//                    int queryID = resultSet.getInt("queryID");
+//                    String studentID = resultSet.getString("studentID");
+//                    String details = resultSet.getString("details");
+//                    Date responseDate = resultSet.getDate("responseDate");
+//                    int responderID = resultSet.getInt("responderID");
+//                    String response = resultSet.getString("response");
+//
+//
+//                    Query q = new Query(queryID,studentID,details,responseDate,responderID,response);
+//                    queries.add(q);
+//                }
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return queries;
+//    }
 }
 

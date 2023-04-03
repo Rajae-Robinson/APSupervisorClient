@@ -1,3 +1,6 @@
+/**
+ * Author: Odane Walters
+ */
 package view;
 
 
@@ -70,10 +73,10 @@ public class Dashboard extends JFrame {
         menuButtons[0].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int outstandingQueries = client.fetchOutstandingQueries();
-                int resolvedQueries = client.fetchResolvedQueries();
-                int outstandingComplaints = client.fetchOutstandingComplaints();
-                int resolvedComplaints = client.fetchResolvedComplaints();
+                int outstandingQueries = client.fetchOutstandingQueriesList().size();
+                int resolvedQueries = client.fetchResolvedQueriesList().size();
+                int outstandingComplaints = client.fetchOutstandingComplaintsList().size();
+                int resolvedComplaints = client.fetchResolvedComplaintsList().size();
 
                 updateServicesPanel(panels[0], outstandingQueries, resolvedQueries, outstandingComplaints, resolvedComplaints);
                 ((CardLayout) centerPanel.getLayout()).show(centerPanel, menuButtons[0].getText());
@@ -223,8 +226,8 @@ public class Dashboard extends JFrame {
             if (selectedRow >= 0) {
                 int queryID = (int) outstandingQueriesTableModel.getValueAt(selectedRow, 0);
                 List<Advisor> advisors = client.fetchAdvisors();
-                String advisorID = showAdvisorSelectionDialog(advisors);
-                if (advisorID != null) {
+                int advisorID = showAdvisorSelectionDialog(advisors);
+                if (advisorID != -1) {
                     client.assignAdvisorToQuery(advisorID, queryID);
                 }
             }
@@ -237,8 +240,8 @@ public class Dashboard extends JFrame {
             if (selectedRow >= 0) {
                 int complaintID = (int) outstandingComplaintsTableModel.getValueAt(selectedRow, 0);
                 List<Advisor> advisors = client.fetchAdvisors();
-                String advisorID = showAdvisorSelectionDialog(advisors);
-                if (advisorID != null) {
+                int advisorID = showAdvisorSelectionDialog(advisors);
+                if (advisorID != -1) {
                     client.assignAdvisorToComplaint(advisorID, complaintID);
                 }
             }
@@ -291,7 +294,7 @@ public class Dashboard extends JFrame {
         panel.repaint();
     }
 
-    private String showAdvisorSelectionDialog(List<Advisor> advisors) {
+    private int showAdvisorSelectionDialog(List<Advisor> advisors) {
         JDialog dialog = new JDialog(this, "Select Advisor", true);
         dialog.setSize(300, 400);
         dialog.setLocationRelativeTo(this);
@@ -317,7 +320,7 @@ public class Dashboard extends JFrame {
         if (selectedIndex >= 0) {
             return advisors.get(selectedIndex).getAdvisorID();
         } else {
-            return null;
+            return -1;
         }
     }
 
@@ -394,8 +397,8 @@ public class Dashboard extends JFrame {
             if (selectedRow >= 0) {
                 int complaintID = (int) outstandingComplaintsTableModel.getValueAt(selectedRow, 0);
                 List<Advisor> advisors = client.fetchAdvisors();
-                String advisorID = showAdvisorSelectionDialog(advisors);
-                if (advisorID != null) {
+                int advisorID = showAdvisorSelectionDialog(advisors);
+                if (advisorID != -1) {
                     client.assignAdvisorToComplaint(advisorID, complaintID);
                 }
             }

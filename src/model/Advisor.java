@@ -1,23 +1,25 @@
 package model;
 
+import java.io.Serializable;
 
-
-public class Advisor {
-    private String advisorID;
+public class Advisor implements Serializable {
+	private static final long serialVersionUID = 3755315976869196098L;
+	
+    private int advisorID;
     private String firstName;
     private String lastName;
 
-    public Advisor(String advisorID, String firstName, String lastName) {
+    public Advisor(int advisorID, String firstName, String lastName) {
         this.advisorID = advisorID;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-    public String getAdvisorID() {
+    public int getAdvisorID() {
         return advisorID;
     }
 
-    public void setAdvisorID(String advisorID) {
+    public void setAdvisorID(int advisorID) {
         this.advisorID = advisorID;
     }
 

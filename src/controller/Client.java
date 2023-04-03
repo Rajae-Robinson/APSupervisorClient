@@ -43,35 +43,24 @@ public class Client {
     }
 
 
-
-        public int fetchOutstandingQueries() {
-            Integer count = (Integer) performAction("getOutstandingQueriesCount");
-            return count != null ? count : -1;
-        }
-
-        public int fetchResolvedQueries() {
-            Integer count = (Integer) performAction("getResolvedQueriesCount");
-            return count != null ? count : -1;
-        }
-
-        public int fetchOutstandingComplaints() {
-            Integer count = (Integer) performAction("getOutstandingComplaintsCount");
-            return count != null ? count : -1;
-        }
-
-        public int fetchResolvedComplaints() {
-            Integer count = (Integer) performAction("getResolvedComplaintsCount");
-            return count != null ? count : -1;
-        }
-
         public List<model.Query> fetchOutstandingQueriesList() {
             List<Query> outstandingQueriesList = (List<Query>) performAction("getOutstandingQueriesList");
             return outstandingQueriesList != null ? outstandingQueriesList : Collections.emptyList();
+        }
+        
+        public List<model.Query> fetchResolvedQueriesList() {
+            List<Query> resolvedQueriesList = (List<Query>) performAction("getResolvedQueriesList");
+            return resolvedQueriesList != null ? resolvedQueriesList : Collections.emptyList();
         }
 
         public List<Complaint> fetchOutstandingComplaintsList() {
             List<Complaint> outstandingComplaintsList = (List<Complaint>) performAction("getOutstandingComplaintsList");
             return outstandingComplaintsList != null ? outstandingComplaintsList : Collections.emptyList();
+        }
+        
+        public List<Complaint> fetchResolvedComplaintsList() {
+            List<Complaint> resolvedComplaintsList = (List<Complaint>) performAction("getResolvedComplaintsList");
+            return resolvedComplaintsList != null ? resolvedComplaintsList : Collections.emptyList();
         }
 
         public List<model.Query> fetchQueriesCategoryList() {
@@ -92,18 +81,18 @@ public class Client {
             return (List<Advisor>) performAction("getAdvisors");
         }
 
-        public String showAdvisorSelectionDialog(List<Advisor> advisors) {
+        public int showAdvisorSelectionDialog(List<Advisor> advisors) {
             AdvisorSelectionDialog dialog = new AdvisorSelectionDialog(null, advisors);
             dialog.setVisible(true);
             Advisor selectedAdvisor = dialog.getSelectedAdvisor();
-            return selectedAdvisor != null ? selectedAdvisor.getAdvisorID() : null;
+            return selectedAdvisor != null ? selectedAdvisor.getAdvisorID() : -1;
         }
 
-        public void assignAdvisorToComplaint(String advisorID, int complaintID) {
+        public void assignAdvisorToComplaint(int advisorID, int complaintID) {
             performAction("assignAdvisorToComplaint", advisorID, complaintID);
         }
 
-        public void assignAdvisorToQuery(String advisorID, int queryID) {
+        public void assignAdvisorToQuery(int advisorID, int queryID) {
             performAction("assignAdvisorToQuery", advisorID, queryID);
         }
 
