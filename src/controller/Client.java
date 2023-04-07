@@ -6,6 +6,7 @@ import model.Advisor;
 import model.Complaint;
 import model.Query;
 
+import model.Student;
 import view.AdvisorSelectionDialog;
 import view.Supervisor;
 
@@ -77,8 +78,12 @@ public class Client {
         }
 
         public List<model.Query> fetchAllQueries(String category) {
-            return (List<Query>) performAction("getQueries", category);
+            return (List<Query>) performAction("getQueries");
         }
+
+    public List<model.Complaint> fetchAllComplaints(String category) {
+        return (List<Complaint>) performAction("getComplaints");
+    }
 
         public List<Advisor> fetchAdvisors() {
             return (List<Advisor>) performAction("getAdvisors");
@@ -99,7 +104,32 @@ public class Client {
             performAction("assignAdvisorToQuery", advisorID, queryID);
         }
 
-
+    public List<Student> fetchStudents() {
+        return (List<Student>) performAction("getStudents");
     }
+
+
+    public List<Query> fetchQueries(int studentID) {
+      return (List<Query>) performAction("getQueries");
+    }
+
+
+    public List<Complaint> fetchComplaints(int studentID) {
+        return (List<Complaint>) performAction("getComplaints");
+    }
+
+
+
+    public List<Complaint> fetchComplaintsCategory(String selectedCategory) {
+        return (List<Complaint>) performAction("getComplaints", selectedCategory);
+    }
+
+    public List<Query> fetchQueriesCategory(String selectedCategory) {
+        return (List<Query>) performAction("getComplaints", selectedCategory);
+    }
+
+
+
+}
 
 

@@ -9,6 +9,7 @@ import model.Advisor;
 import model.Complaint;
 import Sclient.DatabaseConnection;
 import model.Query;
+import model.Student;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -98,11 +99,24 @@ public class Dashboard extends JFrame {
         menuButtons[2].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+
                 List<Query> QueriescategoryList = client.fetchQueriesCategoryList();
                 List<Complaint> ComplaintscategoryList = client.fetchComplaintsCategoryList();
 
                 updateAssignmentsPanel_new(panels[2], QueriescategoryList, ComplaintscategoryList);
                 ((CardLayout) centerPanel.getLayout()).show(centerPanel, menuButtons[2].getText());
+            }
+        });
+
+        menuButtons[3].addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<Student> students = client.fetchStudents();
+                //List<Complaint> outstandingComplaintsList = client.fetchOutstandingComplaintsList();
+
+                Allstudents(panels[3], students);
+                ((CardLayout) centerPanel.getLayout()).show(centerPanel, menuButtons[3].getText());
             }
         });
 
@@ -203,6 +217,7 @@ public class Dashboard extends JFrame {
 
         JTable outstandingQueriesTable = new JTable();
         DefaultTableModel outstandingQueriesTableModel = new DefaultTableModel(new Object[]{"Query ID", "Student ID", "Details"}, 0);
+
 
         for (Query query : outstandingQueriesList) {
             outstandingQueriesTableModel.addRow(new Object[]{query.getQueryID(), query.getStudentID(), query.getDetails()});
@@ -332,8 +347,33 @@ public class Dashboard extends JFrame {
 
         DefaultListModel<String> model = new DefaultListModel<>();
         for (Query query : queries) {
-            model.addElement(query.getQueryID() + " - " + query.getStudentID() + " " + query.getDetails() + " " + query.getResponseDate() + " "
-                    + query.getResponderID() + " " + query.getResponse());
+            model.addElement(query.getQueryID() + " - " + query.getStudentID() + " " + query.getDetails());
+        }
+
+        JList<String> advisorList = new JList<>(model);
+        advisorList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        JButton okButton = new JButton("OK");
+        okButton.addActionListener(e -> dialog.dispose());
+
+        dialog.setLayout(new BorderLayout());
+        dialog.add(new JScrollPane(advisorList), BorderLayout.CENTER);
+        dialog.add(okButton, BorderLayout.SOUTH);
+        dialog.setVisible(true);
+
+        return 0;
+    }
+
+
+    private int showComplaintDialog(List<Complaint> complaints) {
+        JDialog dialog = new JDialog(this, "Complaints", true);
+        dialog.setSize(500, 600);
+        dialog.setLocationRelativeTo(this);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+        DefaultListModel<String> model = new DefaultListModel<>();
+        for (Complaint complaint : complaints) {
+            model.addElement(complaint.getComplaintID() + " - " + complaint.getStudentID() + " " + complaint.getDetails());
         }
 
         JList<String> advisorList = new JList<>(model);
@@ -355,7 +395,7 @@ public class Dashboard extends JFrame {
         panel.removeAll();
 
         JTable outstandingQueriesTable = new JTable();
-        DefaultTableModel outstandingQueriesTableModel = new DefaultTableModel(new Object[]{"Category"}, 0);
+        DefaultTableModel outstandingQueriesTableModel = new DefaultTableModel(new Object[]{"Query Category"}, 0);
 
         for (Query query : QueriescategoryList) {
             outstandingQueriesTableModel.addRow(new Object[]{query.getCategory()});
@@ -365,7 +405,7 @@ public class Dashboard extends JFrame {
 
 
         JTable outstandingComplaintsTable = new JTable();
-        DefaultTableModel outstandingComplaintsTableModel = new DefaultTableModel(new Object[]{"Categories"}, 0);
+        DefaultTableModel outstandingComplaintsTableModel = new DefaultTableModel(new Object[]{"Complaint Categories"}, 0);
 
         for (Complaint complaint : ComplaintscategoryList) {
             outstandingComplaintsTableModel.addRow(new Object[]{complaint.getCategory()});
@@ -390,22 +430,46 @@ public class Dashboard extends JFrame {
 
         });
 
-// Add an "Assign Advisor" button to the complaints table
-        JButton assignComplaintAdvisorButton = new JButton("View");
-        assignComplaintAdvisorButton.addActionListener(e -> {
+        /*JButton assignComplaintAdvisorButton = new JButton("View");
+        assignQueryAdvisorButton.addActionListener(e -> {
             int selectedRow = outstandingComplaintsTable.getSelectedRow();
             if (selectedRow >= 0) {
-                int complaintID = (int) outstandingComplaintsTableModel.getValueAt(selectedRow, 0);
-                List<Advisor> advisors = client.fetchAdvisors();
-                int advisorID = showAdvisorSelectionDialog(advisors);
-                if (advisorID != -1) {
-                    client.assignAdvisorToComplaint(advisorID, complaintID);
+                String selectedCategory = (String) outstandingComplaintsTableModel.getValueAt(selectedRow, 0); // Replace <categoryColumnIndex>
+
+                //List<Query> queries = DatabaseConnection.fetchAllQueries(categories);
+                if (selectedCategory != null) {
+                    List<Complaint> complaints = client.fetchComplaintsCategoryList();//fetchAllComplaints(selectedCategory) ;
+                    showComplaintDialog(complaints);
+                    //showQueryDialog(queries);
                 }
             }
+
+
+        });*/
+        JButton assignComplaintAdvisorButton = new JButton("View");
+        assignComplaintAdvisorButton.addActionListener(e -> {
+
+            int selectedRow = outstandingComplaintsTable.getSelectedRow();
+            if (selectedRow >= 0) {
+                String selectedCategory = (String) outstandingComplaintsTableModel.getValueAt(selectedRow, 0);
+
+
+                if (selectedCategory != null) {
+                    List<Complaint> complaints = client.fetchAllComplaints(selectedCategory);
+
+
+                        showComplaintDialog(complaints);
+                    }
+                }
+            }
+
         });
 
+
+
+
         // Queries table
-        String[] queriesColumnNames = {"Category"};
+        String[] queriesColumnNames = {"Query Category"};
         DefaultTableModel queriesTableModel = new DefaultTableModel(queriesColumnNames, 0);
         for (Query q : QueriescategoryList) {
             queriesTableModel.addRow(new Object[]{q.getCategory()});
@@ -413,15 +477,15 @@ public class Dashboard extends JFrame {
         JTable queriesTable = new JTable(queriesTableModel);
 
         // Complaints table
-        String[] complaintsColumnNames = {"Category"};
+        String[] complaintsColumnNames = {"Complaint Category"};
         DefaultTableModel complaintsTableModel = new DefaultTableModel(complaintsColumnNames, 0);
         for (Complaint c : ComplaintscategoryList) {
-            complaintsTableModel.addRow(new Object[]{c.getComplaintID(), c.getStudentID(), c.getDetails()});
+            complaintsTableModel.addRow(new Object[]{c.getCategory()});    //{c.getComplaintID(), c.getStudentID(), c.getDetails()});
         }
         JTable complaintsTable = new JTable(complaintsTableModel);
 
 
-        JLabel titleLabel = new JLabel("Assignments");
+        JLabel titleLabel = new JLabel("View Categories");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setHorizontalAlignment(JLabel.CENTER);
 
@@ -451,6 +515,100 @@ public class Dashboard extends JFrame {
         panel.repaint();
     }
 
+
+    private void Allstudents(JPanel panel, List<Student> studentList) {
+        panel.removeAll();
+       // List<Student> students = client.fetchStudents();
+        // Create table model
+        DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Student ID", "First Name", "Last Name"}, 0);
+        for (Student student : studentList) {
+            tableModel.addRow(new Object[]{student.getStudentID(), student.getFirstName(), student.getLastName()});
+        }
+
+        // Create table
+        JTable table = new JTable(tableModel);
+
+        // Create search bar
+        JTextField searchField = new JTextField(20);
+        JButton searchButton = new JButton("Search");
+        JPanel searchPanel = new JPanel(new FlowLayout());
+        searchPanel.add(new JLabel("Search by Student ID: "));
+        searchPanel.add(searchField);
+        searchPanel.add(searchButton);
+
+        // Create select button
+        JButton selectButton = new JButton("Select");
+        selectButton.setEnabled(false);  // Disable button until a row is selected
+        selectButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow >= 0) {
+                int studentID = (int) tableModel.getValueAt(selectedRow, 0);
+                List<Query> queries = client.fetchQueries(studentID);
+                List<Complaint> complaints = client.fetchComplaints(studentID);
+
+                // Create table model for queries
+                DefaultTableModel queryTableModel = new DefaultTableModel(new Object[]{"Query ID", "Category", "Details"}, 0);
+                for (Query query : queries) {
+                    queryTableModel.addRow(new Object[]{query.getQueryID(), query.getCategory(), query.getDetails()});
+                }
+
+                // Create table model for complaints
+                DefaultTableModel complaintTableModel = new DefaultTableModel(new Object[]{"Complaint ID", "Category", "Details"}, 0);
+                for (Complaint complaint : complaints) {
+                    complaintTableModel.addRow(new Object[]{complaint.getComplaintID(), complaint.getCategory(), complaint.getDetails()});
+                }
+
+                // Create table for queries
+                JTable queryTable = new JTable(queryTableModel);
+
+                // Create table for complaints
+                JTable complaintTable = new JTable(complaintTableModel);
+
+                // Create tabs for queries and complaints
+                JTabbedPane tabbedPane = new JTabbedPane();
+                tabbedPane.addTab("Queries", new JScrollPane(queryTable));
+                tabbedPane.addTab("Complaints", new JScrollPane(complaintTable));
+
+                // Show the tabbed pane in a dialog box
+                JOptionPane.showMessageDialog(panel, tabbedPane, "Queries and Complaints for Student " + studentID, JOptionPane.PLAIN_MESSAGE);
+            }
+        });
+
+        // Add listeners for search field and table selection
+        searchField.addActionListener(e -> searchTable(table, tableModel, searchField.getText()));
+        searchButton.addActionListener(e -> searchTable(table, tableModel, searchField.getText()));
+        table.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                boolean rowSelected = table.getSelectedRow() >= 0;
+                selectButton.setEnabled(rowSelected);
+            }
+        });
+
+        // Create table panel
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.add(new JScrollPane(table), BorderLayout.CENTER);
+        tablePanel.add(selectButton, BorderLayout.SOUTH);
+
+        // Add components to main panel
+        panel.setLayout(new BorderLayout());
+        panel.add(searchPanel, BorderLayout.NORTH);
+        panel.add(tablePanel, BorderLayout.CENTER);
+
+        panel.revalidate();
+        panel.repaint();
+    }
+
+    private void searchTable(JTable table, DefaultTableModel tableModel, String searchText) {
+        for (int row = 0; row < table.getRowCount(); row++) {
+            int studentID = (int) tableModel.getValueAt(row, 0);
+            if (String.valueOf(studentID).contains(searchText)) {
+                table.getSelectionModel().setSelectionInterval(row, row);
+                return;
+            }
+        }
+        // If search text not found, clear selection
+        table.getSelectionModel().clearSelection();
+    }
 
 
 
