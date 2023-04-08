@@ -17,7 +17,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 
 public class Dashboard extends JFrame {
@@ -54,11 +57,11 @@ public class Dashboard extends JFrame {
 
         // Create menu buttons
         menuButtons = new JButton[5];
-        menuButtons[0] = new JButton("Services", new ImageIcon("C:\\Users\\odane\\Desktop\\AP\\admin.png"));
-        menuButtons[1] = new JButton("Assignments", new ImageIcon("C:\\Users\\odane\\Desktop\\AP\\add.png"));
-        menuButtons[2] = new JButton("View Categories", new ImageIcon("C:\\Users\\odane\\Desktop\\AP\\view.png"));
-        menuButtons[3] = new JButton("View Student", new ImageIcon("C:\\Users\\odane\\Desktop\\AP\\folder.png"));
-        menuButtons[4] = new JButton("Video Chat", new ImageIcon("C:\\Users\\odane\\Desktop\\AP\\setting.png"));
+        menuButtons[0] = new JButton("Services", new ImageIcon("src/admin.png"));//"C:\\Users\\odane\\Desktop\\AP\\admin.png"));
+        menuButtons[1] = new JButton("Assignments", new ImageIcon("src/add.png"));//"C:\\Users\\odane\\Desktop\\AP\\add.png"));
+        menuButtons[2] = new JButton("View Categories", new ImageIcon("src/view.png"));//"C:\\Users\\odane\\Desktop\\AP\\view.png"));
+        menuButtons[3] = new JButton("View Student", new ImageIcon("src/folder.png"));//"C:\\Users\\odane\\Desktop\\AP\\folder.png"));
+        menuButtons[4] = new JButton("Video Chat", new ImageIcon("src/setting.png"));//"C:\\Users\\odane\\Desktop\\AP\\setting.png"));
 
         int buttonWidth = 120;
 
@@ -74,10 +77,11 @@ public class Dashboard extends JFrame {
         menuButtons[0].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int outstandingQueries = client.fetchOutstandingQueriesList().size();
-                int resolvedQueries = client.fetchResolvedQueriesList().size();
                 int outstandingComplaints = client.fetchOutstandingComplaintsList().size();
                 int resolvedComplaints = client.fetchResolvedComplaintsList().size();
+                int outstandingQueries = client.fetchOutstandingQueriesList().size();
+                int resolvedQueries = client.fetchResolvedQueriesList().size();
+
 
                 updateServicesPanel(panels[0], outstandingQueries, resolvedQueries, outstandingComplaints, resolvedComplaints);
                 ((CardLayout) centerPanel.getLayout()).show(centerPanel, menuButtons[0].getText());
@@ -396,19 +400,28 @@ public class Dashboard extends JFrame {
 
         JTable outstandingQueriesTable = new JTable();
         DefaultTableModel outstandingQueriesTableModel = new DefaultTableModel(new Object[]{"Query Category"}, 0);
+        Set<String> categoriesAdded = new HashSet<>();
 
         for (Query query : QueriescategoryList) {
-            outstandingQueriesTableModel.addRow(new Object[]{query.getCategory()});
+            String category = query.getCategory();
+            if (!categoriesAdded.contains(category)) {
+                outstandingQueriesTableModel.addRow(new Object[]{category});
+                categoriesAdded.add(category);
+            }
         }
 
         outstandingQueriesTable.setModel(outstandingQueriesTableModel);
 
-
         JTable outstandingComplaintsTable = new JTable();
         DefaultTableModel outstandingComplaintsTableModel = new DefaultTableModel(new Object[]{"Complaint Categories"}, 0);
+        categoriesAdded.clear();
 
         for (Complaint complaint : ComplaintscategoryList) {
-            outstandingComplaintsTableModel.addRow(new Object[]{complaint.getCategory()});
+            String category = complaint.getCategory();
+            if (!categoriesAdded.contains(category)) {
+                outstandingComplaintsTableModel.addRow(new Object[]{category});
+                categoriesAdded.add(category);
+            }
         }
 
         outstandingComplaintsTable.setModel(outstandingComplaintsTableModel);
@@ -419,15 +432,12 @@ public class Dashboard extends JFrame {
             if (selectedRow >= 0) {
                 String selectedCategory = (String) outstandingQueriesTableModel.getValueAt(selectedRow, 0); // Replace <categoryColumnIndex>
 
-                //List<Query> queries = DatabaseConnection.fetchAllQueries(categories);
                 if (selectedCategory != null) {
                     List<Query> queries = client.fetchAllQueries(selectedCategory);
+                    queries.removeIf(query -> !Objects.equals(query.getCategory(), selectedCategory));
                     showQueryDialog(queries);
-                    //showQueryDialog(queries);
                 }
             }
-
-
         });
 
         /*JButton assignComplaintAdvisorButton = new JButton("View");
@@ -453,18 +463,13 @@ public class Dashboard extends JFrame {
             if (selectedRow >= 0) {
                 String selectedCategory = (String) outstandingComplaintsTableModel.getValueAt(selectedRow, 0);
 
-
                 if (selectedCategory != null) {
                     List<Complaint> complaints = client.fetchAllComplaints(selectedCategory);
-
-
-                        showComplaintDialog(complaints);
-                    }
+                    complaints.removeIf(complaint -> !Objects.equals(complaint.getCategory(), selectedCategory));
+                    showComplaintDialog(complaints);
                 }
             }
-
         });
-
 
 
 
@@ -518,7 +523,7 @@ public class Dashboard extends JFrame {
 
     private void Allstudents(JPanel panel, List<Student> studentList) {
         panel.removeAll();
-       // List<Student> students = client.fetchStudents();
+        // List<Student> students = client.fetchStudents();
         // Create table model
         DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Student ID", "First Name", "Last Name"}, 0);
         for (Student student : studentList) {
@@ -549,13 +554,17 @@ public class Dashboard extends JFrame {
                 // Create table model for queries
                 DefaultTableModel queryTableModel = new DefaultTableModel(new Object[]{"Query ID", "Category", "Details"}, 0);
                 for (Query query : queries) {
-                    queryTableModel.addRow(new Object[]{query.getQueryID(), query.getCategory(), query.getDetails()});
+                    if (query.getStudentID() == studentID) {
+                        queryTableModel.addRow(new Object[]{query.getQueryID(), query.getCategory(), query.getDetails()});
+                    }
                 }
 
                 // Create table model for complaints
                 DefaultTableModel complaintTableModel = new DefaultTableModel(new Object[]{"Complaint ID", "Category", "Details"}, 0);
                 for (Complaint complaint : complaints) {
-                    complaintTableModel.addRow(new Object[]{complaint.getComplaintID(), complaint.getCategory(), complaint.getDetails()});
+                    if (complaint.getStudentID() == studentID) {
+                        complaintTableModel.addRow(new Object[]{complaint.getComplaintID(), complaint.getCategory(), complaint.getDetails()});
+                    }
                 }
 
                 // Create table for queries

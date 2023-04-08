@@ -46,8 +46,19 @@ public class Client {
         }
     }
 
+    public boolean authenticate(String userID, String userPass) {
+        Object response = performAction("authenticate", userID, userPass);
+        if (response instanceof Boolean) {
+            return (Boolean) response;
+        } else {
+            return false;
+        }
+    }
 
-        public List<model.Query> fetchOutstandingQueriesList() {
+
+
+
+    public List<model.Query> fetchOutstandingQueriesList() {
             List<Query> outstandingQueriesList = (List<Query>) performAction("getOutstandingQueriesList");
             return outstandingQueriesList != null ? outstandingQueriesList : Collections.emptyList();
         }

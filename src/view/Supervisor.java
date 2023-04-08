@@ -6,6 +6,7 @@ package view;
 
 
 import Sclient.DatabaseConnection;
+import controller.Client;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -23,12 +24,15 @@ public class Supervisor {
     private JCheckBox checkBoxShowPass;
     private JPasswordField passwordField;
     private JTextField textFieldUsername;
+    private Client client;
 
     public Supervisor() {
+        client = new Client("localhost", 8888);
         createLoginForm();
     }
 
-    private void createLoginForm() {
+
+        private void createLoginForm() {
         frame = new JFrame("Login Form");
         panel = new JPanel();
         checkBoxShowPass = new JCheckBox("Show Password");
@@ -37,6 +41,7 @@ public class Supervisor {
         JLabel jLabel_close = new JLabel();
         JLabel jLabel_user = new JLabel("ID:");
         JLabel jLabel_pass = new JLabel("Password");
+        jLabel_pass.setPreferredSize(new Dimension(200, 50));
         JLabel jLabel_showPass = new JLabel();
         JLabel jLabel_up = new JLabel();
         JLabel jLabel_title = new JLabel("Login Form");
@@ -71,8 +76,9 @@ public class Supervisor {
         frame.setLocationRelativeTo(null);
 
         // set icons
-        //jLabel_close.setIcon(new ImageIcon(getClass().getResource("../IMAGES/x.png")));
-        // jLabel_user.setIcon(new ImageIcon(getClass().getResource("admin.png")));
+
+
+            // jLabel_user.setIcon(new ImageIcon(getClass().getResource("admin.png")));
         // jLabel_pass.setIcon(new ImageIcon(getClass().getResource("../IMAGES/lock.png")));
         //jLabel_showPass.setIcon(new ImageIcon(getClass().getResource("../IMAGES/eye.png")));
         //jLabel_up.setIcon(new ImageIcon(getClass().getResource("../IMAGES/up.png")));
@@ -86,7 +92,7 @@ public class Supervisor {
 
         // add the panel to the frame and set the frame properties
         frame.add(panel);
-        frame.setSize(400, 300);
+        frame.setSize(600, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
@@ -95,8 +101,8 @@ public class Supervisor {
         jLabel_title.setBounds(30, 30, 120, 30);
         jLabel_user.setBounds(40, 80, 50, 20);
         textFieldUsername.setBounds(70, 80, 160, 20);
-        jLabel_pass.setBounds(40, 120, 20, 20);
-        passwordField.setBounds(70, 120, 160, 20);
+        jLabel_pass.setBounds(40, 120, 80, 20);
+        passwordField.setBounds(100, 120, 160, 20);
         checkBoxShowPass.setBounds(70, 150, 120, 20);
         jLabel_showPass.setBounds(240, 120, 20, 20);
         jLabel_up.setBounds(240, 80, 20, 20);
@@ -117,7 +123,7 @@ public class Supervisor {
                 String userPass = new String(passwordField.getPassword());
 
                 // validate the username and password
-                if (DatabaseConnection.authenticate(userID, userPass)) {
+                if (client.authenticate(userID, userPass)) {
                     JOptionPane.showMessageDialog(frame, "Login Successful!");
                     //Dashboard dashboard = new Dashboard();
                     String supervisorID = userID;
